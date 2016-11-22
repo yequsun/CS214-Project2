@@ -2,28 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include "compress.h"
 
-char* create_output_filename(char * filename, int len, int i){
-
-	//make string of length: [filename] + [_LOLS] + [max allowed digits in partlength]
-	char * new_filename;
-	new_filename = (char *)malloc(len + strlen("_LOLS") + 10);
-
-	sprintf(new_filename, "%s_LOLS%d", filename, i);
-	
-	int j;
-	for(j=strlen(new_filename)-1;j>0;j--){
-		if(new_filename[j]=='.'){
-			new_filename[j] = '_';
-			break;
-			//replace the last dot with underscore
-		}
-	}
-
-	return new_filename;
-}
-
-void compress(char * filename, int partno, int cursor, int size){
+void compressR(char * filename, int partno, int cursor, int size){
 
 	char * new_filename = create_output_filename(filename, strlen(filename), partno);
 
@@ -70,22 +51,8 @@ void compress(char * filename, int partno, int cursor, int size){
 	fclose(output);
 }
 
-void writeLOLS(FILE * output, int seq_length, char prev){
-	if(seq_length > 2){
-		fprintf(output, "%d%c", seq_length, prev);
-	}
-	else if(seq_length == 2){
-		fprintf(output, "%c%c", prev, prev);
-	}
-	else if(seq_length == 1){
-		fprintf(output, "%c", prev);
-	}
 
-}
-
-
-
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
 	//worker
 	//argv[1] file
@@ -104,7 +71,7 @@ int main(int argc, char const *argv[])
 			params[5] = (char*)NULL;*/
 
 
-	compress(argv[1],atoi(argv[3]),atoi(argv[2]),atoi(argv[4]));
+	compressR(argv[1],atoi(argv[3]),atoi(argv[2]),atoi(argv[4]));
 
 
 

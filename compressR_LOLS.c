@@ -4,8 +4,9 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "compress.h"
 
-int main(int argc, char const *argv[])
+int main(int argc, char *argv[])
 {
 	if(argc != 3){
 		printf("incorrect arguments\n");
@@ -19,13 +20,21 @@ int main(int argc, char const *argv[])
 
 	char * filename = argv[1];
 	int parts = atoi(argv[2]);
+
+	compressR_LOLS(filename, parts);
+
+	return 0;
+}
+
+void compressR_LOLS(char * filename, int parts){
+
 	int filesize, partsize, partsize_first;
 
 	FILE *file = fopen(filename, "r");
 
 	if(file == NULL){
-		printf("File error\n");
-		return 0;
+		printf("File error.\n");
+		return;
 	}
 
 	fseek(file, 0, SEEK_END);
@@ -37,14 +46,14 @@ int main(int argc, char const *argv[])
 	rewind(file);
 
 	if(filesize<parts){
-		printf("Too many parts\n");
-		return 0;
+		printf("Too many parts.\n");
+		return;
 	}
 
 	pid_t pid = 1;
 	int i;
 
-	for(i=0;i<parts;++i){
+	for(i=0; i<parts; ++i){
 		if((pid = fork()) <0){
 			printf("Fork failed\n");
 			abort();
@@ -80,8 +89,6 @@ int main(int argc, char const *argv[])
 			params[5] = (char*)NULL;
 
 			execv(params[0],params);
-
-
 		}
 	}
 
@@ -94,8 +101,6 @@ int main(int argc, char const *argv[])
 	}
 
 	printf("complete\n");
-	
 
-
-	return 0;
+	return;
 }

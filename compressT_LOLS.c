@@ -2,23 +2,26 @@
 #include <stdio.h>
 #include <pthread.h>
 #include <string.h>
+#include <ctype.h>
 #include "compress.h"
 
 int main(int argc, char * argv[]){
 	if(argc != 3){
 		printf("incorrect arguments");
-		return;
+		return 0;
 	}
 
 	if(atoi(argv[2]) < 1){
 		printf("Must specify 1 or more parts.");
-		return;
+		return 0;
 	}
 
 	char * filename = argv[1];
 	int parts = atoi(argv[2]);
 
 	compressT_LOLS(filename, parts);
+
+	return 0;
 }
 
 void compressT_LOLS(char * filename, int parts){
@@ -40,6 +43,12 @@ void compressT_LOLS(char * filename, int parts){
 	fseek(input, 0, SEEK_END);
 
 	filesize = ftell(input);
+
+	if(parts > filesize){
+		printf("Too many parts.\n");
+		return;
+	}
+
 	partsize = filesize / parts; //split the filesize into parts
 	partsize_1st = partsize + (filesize % parts);  //calculate the size of part 1
 
@@ -94,7 +103,7 @@ void * compress(void * ptr){
 
 	char * new_filename = create_output_filename(filename, strlen(filename), partno);
 
-	printf("input file is %s\noutput file is %s\npartno is %d\nstart is %d\nend is %d\n", filename, new_filename, partno, start, end);
+	//printf("input file is %s\noutput file is %s\npartno is %d\nstart is %d\nend is %d\n", filename, new_filename, partno, start, end);
 
 	FILE * input = fopen(filename, "r");
 	FILE * output = fopen(new_filename, "w");
@@ -110,6 +119,9 @@ void * compress(void * ptr){
 	for(i = start + 1; i < end; i++){
 		fseek(input, i, SEEK_SET);
 		curr = fgetc(input);
+		if(!isalpha(curr)){
+			continue;
+		}
 
 		if(curr == prev){
 			seq_length++;
@@ -123,36 +135,13 @@ void * compress(void * ptr){
 		prev = curr;
 	}	
 
-	writeLOLS(output, seq_length, prev);
+	if(isalpha(prev)){
+		writeLOLS(output, seq_length, prev);
+	}
+	
 	printf("done\n");
 
 	fclose(output);
 
 	return NULL;
-}
-
-void writeLOLS(FILE * output, int seq_length, char c){
-	if(seq_length > 2){
-		fprintf(output, "%d%c", seq_length, c);
-	}
-	else if(seq_length == 2){
-		fprintf(output, "%c%c", c, c);
-	}
-	else if(seq_length == 1){
-		fprintf(output, "%c", c);
-	}
-}
-
-char * create_output_filename(char * filename, int len, int i){
-
-	//make string of length: [filename] + [_LOLS] + [max allowed digits in partlength]
-	char * new_filename;
-	new_filename = (char *)malloc(len + strlen("_LOLS") + 2);
-
-	int dot_pos = len - 4;
-
-	sprintf(new_filename, "%s_LOLS%d", filename, i);
-	new_filename[dot_pos] = '_';
-
-	return new_filename;
 }
