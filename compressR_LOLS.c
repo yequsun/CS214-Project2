@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <error.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "compress.h"
@@ -9,12 +11,13 @@
 int main(int argc, char *argv[])
 {
 	if(argc != 3){
-		printf("incorrect arguments\n");
+		printf("Error: incorrect number of arguments.\nPlease enter <filename> <number of parts>\n");
+
 		return 0;
 	}
 
 	if(atoi(argv[2]) < 1){
-		printf("Must specify 1 or more parts.\n");
+		printf("Error: must specify 1 or more parts.\n");
 		return 0;
 	}
 
@@ -30,6 +33,19 @@ void compressR_LOLS(char * filename, int parts){
 
 	int filesize, partsize, partsize_first;
 
+	if(access(filename, R_OK) != 0){
+		if(errno == ENOENT){
+			printf("Error: file doesn't exist.\n");
+		}
+		else if(errno == EACCES){
+			printf("Error: permission denied.\n");
+		}
+		else{
+			printf("File error.");
+		}
+		return;
+	}
+
 	FILE *file = fopen(filename, "r");
 
 	if(file == NULL){
@@ -39,15 +55,16 @@ void compressR_LOLS(char * filename, int parts){
 
 	fseek(file, 0, SEEK_END);
 
-	filesize = ftell(file);
+	filesize = ftell(file) - 1;
 	partsize = filesize / parts;
 	partsize_first = partsize + filesize%parts;
 
+	printf("filesize is %d, partsize is %d\n", filesize, partsize);
 	rewind(file);
 	fclose(file);
 
 	if(filesize<parts){
-		printf("Too many parts.\n");
+		printf("Error: Too many parts.\n");
 		return;
 	}
 

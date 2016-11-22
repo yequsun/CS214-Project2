@@ -4,16 +4,18 @@
 #include <string.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <error.h>
+#include <errno.h>
 #include "compress.h"
 
 int main(int argc, char * argv[]){
 	if(argc != 3){
-		printf("incorrect arguments");
+		printf("Error: incorrect number of arguments.\nPlease enter <filename> <number of parts>\n");
 		return 0;
 	}
 
 	if(atoi(argv[2]) < 1){
-		printf("Must specify 1 or more parts.");
+		printf("Error: must specify 1 or more parts.\n");
 		return 0;
 	}
 
@@ -34,28 +36,39 @@ void compressT_LOLS(char * filename, int parts){
 		partsize,
 		partsize_1st;
 
-	FILE * input = fopen(filename, "r");
+	if(access(filename, R_OK) != 0){
+		if(errno == ENOENT){
+			printf("Error: file doesn't exist.\n");
+		}
+		else if(errno == EACCES){
+			printf("Error: permission denied.\n");
+		}
+		else{
+			printf("File error.");
+		}
+		return;
+	}
+
+	FILE * input = fopen("", "r");
 
 	if(input == NULL){
-		printf("File error");
+		printf("File error.\n");
 		return;
 	}
 
 	fseek(input, 0, SEEK_END);
 
 	filesize = ftell(input) - 1;
-
-	if(parts > filesize){
-		printf("Too many parts.\n");
-		return;
-	}
-
 	partsize = filesize / parts; //split the filesize into parts
 	partsize_1st = partsize + (filesize % parts);  //calculate the size of part 1
 
-	printf("Filesize is %d\nPartsize is %d\n1st partsize is %d\n", filesize, partsize, partsize_1st);
-
 	rewind(input);
+	fclose(input);
+
+	if(parts > filesize){
+		printf("Error: Too many parts.\n");
+		return;
+	}
 
 	//create an array to hold the thread id's
 	pthread_t * thread_array;
@@ -112,8 +125,6 @@ void * compress(void * ptr){
 		return NULL;
 	}
 
-	//printf("input file is %s\noutput file is %s\npartno is %d\nstart is %d\nend is %d\n", filename, new_filename, partno, start, end);
-
 	FILE * input = fopen(filename, "r");
 	FILE * output = fopen(new_filename, "w");
 
@@ -149,8 +160,6 @@ void * compress(void * ptr){
 	if(isalpha(prev)){
 		writeLOLS(output, seq_length, prev);
 	}
-
-	printf("done\n");
 
 	fclose(output);
 	fclose(input);

@@ -18,7 +18,7 @@ void compressR(char * filename, char * new_filename, int cursor, int size){
 	FILE * output = fopen(new_filename, "w");
 
 	if(output == NULL){
-		printf("File error");
+		printf("File error.\n");
 		exit(0);
 	}
 
@@ -34,7 +34,6 @@ void compressR(char * filename, char * new_filename, int cursor, int size){
 	for(i = cursor; i < size+cursor; i++){
 		fseek(input, i, SEEK_SET);
 		test = fgetc(input);
-		printf("char is %c\ncurr is %c\nprev is %c\n", test, curr, prev);
 		
 		if(isalpha(test)){
 			curr = test;	
