@@ -3,12 +3,17 @@
 #include <string.h>
 #include "compress.h"
 
-char* create_output_filename(char * filename, int len, int i){
+char* create_output_filename(char * filename, int len, int i, int parts){
 	//make string of length: [filename] + [_LOLS] + [max allowed digits in partlength]
 	char * new_filename;
 	new_filename = (char *)malloc(len + strlen("_LOLS") + 10);
 
-	sprintf(new_filename, "%s_LOLS%d", filename, i);
+	if(parts == 1){
+		sprintf(new_filename, "%s_LOLS", filename);
+	}
+	else{
+		sprintf(new_filename, "%s_LOLS%d", filename, i);
+	}
 	
 	int j;
 	for(j=strlen(new_filename)-1;j>0;j--){

@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "compress.h"
 
 int main(int argc, char * argv[]){
@@ -42,7 +43,7 @@ void compressT_LOLS(char * filename, int parts){
 
 	fseek(input, 0, SEEK_END);
 
-	filesize = ftell(input);
+	filesize = ftell(input) - 1;
 
 	if(parts > filesize){
 		printf("Too many parts.\n");
@@ -70,6 +71,7 @@ void compressT_LOLS(char * filename, int parts){
 		t_info->filename = filename;
 		t_info->partno = i;
 		t_info->start = start;
+		t_info->parts = parts;
 
 		if(i == 0){
 			t_info->length = partsize_1st;
@@ -100,8 +102,15 @@ void * compress(void * ptr){
 	int partno = t_info->partno;
 	int start = t_info->start;
 	int end = start + (t_info->length);
+	int parts = t_info->parts;
 
-	char * new_filename = create_output_filename(filename, strlen(filename), partno);
+	char * new_filename = create_output_filename(filename, strlen(filename), partno, parts);
+
+	//check if output file already exists:
+	if(access(new_filename, F_OK) != -1){
+		printf("Compressed file already exists.\n");
+		return NULL;
+	}
 
 	//printf("input file is %s\noutput file is %s\npartno is %d\nstart is %d\nend is %d\n", filename, new_filename, partno, start, end);
 
@@ -138,10 +147,11 @@ void * compress(void * ptr){
 	if(isalpha(prev)){
 		writeLOLS(output, seq_length, prev);
 	}
-	
+
 	printf("done\n");
 
 	fclose(output);
+	free(new_filename);
 
 	return NULL;
 }

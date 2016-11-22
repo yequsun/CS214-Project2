@@ -66,12 +66,12 @@ void compressR_LOLS(char * filename, int parts){
 			}else{
 				offset = partsize_first + (i-1)*partsize;
 			}
+
+			char * new_filename = create_output_filename(filename, strlen(filename), i, parts);
+			
 			char offset_char[10];
 			sprintf(offset_char, "%d", offset);
 			//printf("%s\n", offset_char);
-
-			char i_char[10];
-			sprintf(i_char, "%d", i);
 
 			char partsize_char[10];
 			if(i==0){
@@ -83,8 +83,8 @@ void compressR_LOLS(char * filename, int parts){
 			char* params[6];
 			params[0] = "./compressR_worker_LOLS";
 			params[1] = filename;
-			params[2] = offset_char;
-			params[3] = i_char;
+			params[2] = new_filename;
+			params[3] = offset_char;
 			params[4] = partsize_char;
 			params[5] = (char*)NULL;
 

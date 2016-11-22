@@ -2,13 +2,18 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <unistd.h>
 #include "compress.h"
 
-void compressR(char * filename, int partno, int cursor, int size){
-
-	char * new_filename = create_output_filename(filename, strlen(filename), partno);
+void compressR(char * filename, char * new_filename, int cursor, int size){
 
 	FILE* input = fopen(filename,"r");
+
+	//check if output file already exists:
+	if(access(new_filename, F_OK) != -1){
+		printf("Compressed file already exists.\n");
+		return;
+	}
 
 	FILE * output = fopen(new_filename, "w");
 
@@ -71,7 +76,7 @@ int main(int argc, char *argv[])
 			params[5] = (char*)NULL;*/
 
 
-	compressR(argv[1],atoi(argv[3]),atoi(argv[2]),atoi(argv[4]));
+	compressR(argv[1], argv[2], atoi(argv[3]),atoi(argv[4]));
 
 
 
