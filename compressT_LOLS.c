@@ -119,29 +119,31 @@ void * compress(void * ptr){
 
 	int seq_length = 1,
 		i;
-	char prev,
+	char test,
+		 prev,
 		 curr;
 
 	fseek(input, start, SEEK_SET);
-	prev = fgetc(input);
+	prev = '\0';
 
 	for(i = start + 1; i < end; i++){
 		fseek(input, i, SEEK_SET);
-		curr = fgetc(input);
-		if(!isalpha(curr)){
-			continue;
-		}
+		test = fgetc(input);
+		
+		if(isalpha(test)){
+			curr = test;	
+			
+			if(curr == prev){
+				seq_length++;
+			}
 
-		if(curr == prev){
-			seq_length++;
-		}
+			else if(prev != '\0'){
+				writeLOLS(output, seq_length, prev);
+				seq_length = 1;
+			}
 
-		else{
-			writeLOLS(output, seq_length, prev);
-			seq_length = 1;
+			prev = curr;
 		}
-
-		prev = curr;
 	}	
 
 	if(isalpha(prev)){
@@ -151,6 +153,7 @@ void * compress(void * ptr){
 	printf("done\n");
 
 	fclose(output);
+	fclose(input);
 	free(new_filename);
 
 	return NULL;

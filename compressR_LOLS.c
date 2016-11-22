@@ -44,6 +44,7 @@ void compressR_LOLS(char * filename, int parts){
 	partsize_first = partsize + filesize%parts;
 
 	rewind(file);
+	fclose(file);
 
 	if(filesize<parts){
 		printf("Too many parts.\n");

@@ -24,29 +24,32 @@ void compressR(char * filename, char * new_filename, int cursor, int size){
 
 	int seq_length = 1,
 		i;
-	char prev,
+	char test,
+		 prev,
 		 curr;
 
 	fseek(input, cursor, SEEK_SET);
-	prev = fgetc(input);
+	prev = '\0';
 
-	for(i = cursor + 1; i < size+cursor; i++){
+	for(i = cursor; i < size+cursor; i++){
 		fseek(input, i, SEEK_SET);
-		curr = fgetc(input);
-		if(!isalpha(curr)){
-			continue;
-		}
+		test = fgetc(input);
+		printf("char is %c\ncurr is %c\nprev is %c\n", test, curr, prev);
+		
+		if(isalpha(test)){
+			curr = test;	
+			
+			if(curr == prev){
+				seq_length++;
+			}
 
-		if(curr == prev){
-			seq_length++;
-		}
+			else if(prev != '\0'){
+				writeLOLS(output, seq_length, prev);
+				seq_length = 1;
+			}
 
-		else{
-			writeLOLS(output, seq_length, prev);
-			seq_length = 1;
+			prev = curr;
 		}
-
-		prev = curr;
 	}	
 
 	if(isalpha(prev)){
@@ -54,6 +57,7 @@ void compressR(char * filename, char * new_filename, int cursor, int size){
 	}
 
 	fclose(output);
+	fclose(input);
 }
 
 
