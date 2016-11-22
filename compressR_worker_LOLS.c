@@ -1,17 +1,24 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 char* create_output_filename(char * filename, int len, int i){
 
 	//make string of length: [filename] + [_LOLS] + [max allowed digits in partlength]
 	char * new_filename;
-	new_filename = (char *)malloc(len + strlen("_LOLS") + 2);
-
-	int dot_pos = len - 4;
+	new_filename = (char *)malloc(len + strlen("_LOLS") + 10);
 
 	sprintf(new_filename, "%s_LOLS%d", filename, i);
-	new_filename[dot_pos] = '_';
+	
+	int j;
+	for(j=strlen(new_filename)-1;j>0;j--){
+		if(new_filename[j]=='.'){
+			new_filename[j] = '_';
+			break;
+			//replace the last dot with underscore
+		}
+	}
 
 	return new_filename;
 }
@@ -40,6 +47,9 @@ void compress(char * filename, int partno, int cursor, int size){
 	for(i = cursor + 1; i < size+cursor; i++){
 		fseek(input, i, SEEK_SET);
 		curr = fgetc(input);
+		if(!isalpha(curr)){
+			continue;
+		}
 
 		if(curr == prev){
 			seq_length++;
@@ -53,7 +63,9 @@ void compress(char * filename, int partno, int cursor, int size){
 		prev = curr;
 	}	
 
-	writeLOLS(output, seq_length, prev);
+	if(isalpha(prev)){
+		writeLOLS(output, seq_length, prev);
+	}
 
 	fclose(output);
 }
