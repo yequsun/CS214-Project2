@@ -1,0 +1,227 @@
+T = threads version
+R = processes version
+
+====Too few arguments====
+T 
+INPUT: 
+./compressT_LOLS
+OUTPUT: 
+Error: incorrect number of arguments.
+Please enter <filename> <number of parts>
+
+R
+INPUT:
+./compressR_LOLS
+OUTPUT:
+Error: incorrect number of arguments.
+Please enter <filename> <number of parts>
+
+
+====Too many arguments====
+T 
+INPUT: 
+./compressT_LOLS "hello.txt" 123 456 
+OUTPUT: 
+Error: incorrect number of arguments.
+Please enter <filename> <number of parts>
+
+R
+INPUT:
+./compressR_LOLS "hello.txt" 123 456
+OUTPUT:
+Error: incorrect number of arguments.
+Please enter <filename> <number of parts>
+
+
+====Negative number of parts====
+T 
+INPUT: 
+./compressT_LOLS "hello.txt" -15 
+OUTPUT: 
+Error: must specify 1 or more parts.
+
+R
+INPUT:
+./compressR_LOLS "hello.txt" -15
+OUTPUT:
+Error: must specify 1 or more parts.
+
+
+====Non-existant file====
+T 
+INPUT: 
+./compressT_LOLS "404.txt" 2 
+OUTPUT: 
+Error: file doesn't exist.
+
+R
+INPUT:
+./compressR_LOLS "404.txt" 2
+OUTPUT:
+Error: file doesn't exist.
+
+
+====Wrong permissions====
+T
+INPUT:
+./compressT_LOLS "/dev/cpu/microcode" 2 
+OUTPUT:
+Error: permission denied.
+
+R
+INPUT:
+./compressR_LOLS "/dev/cpu/microcode" 2 
+OUTPUT:
+Error: permission denied.
+
+
+====Number of parts higher than number of characters====
+T
+INPUT:
+./compressT_LOLS "hello.txt" 50 
+OUTPUT:
+Error: You asked for 50 parts. There are only 5 characters in the file.
+
+R
+INPUT:
+./compressR_LOLS "hello.txt" 50 
+OUTPUT:
+Error: You asked for 50 parts. There are only 5 characters in the file.
+
+
+====Simple compression, 1 part====
+File contents, vowels.txt:
+aaaaeeeeiiiioooouuuu
+
+INPUT:
+./compressT_LOLS "vowels.txt" 1
+
+OUTPUT:
+vowels_txt_LOLS : 4a4e4i4o4u
+
+INPUT:
+./compressR_LOLS "vowels.txt" 1
+
+OUTPUT:
+vowels_txt_LOLS : 4a4e4i4o4u
+
+
+====Simple compression, multipart====
+T
+INPUT:
+./compressT_LOLS "vowels.txt" 5
+
+OUTPUT:
+vowels_txt_LOLS0 : 4a
+vowels_txt_LOLS1 : 4e
+vowels_txt_LOLS2 : 4i
+vowels_txt_LOLS3 : 4o
+vowels_txt_LOLS4 : 4u
+
+R
+INPUT:
+./compressR_LOLS "vowels.txt" 5
+
+OUTPUT:
+vowels_txt_LOLS0 : 4a
+vowels_txt_LOLS1 : 4e
+vowels_txt_LOLS2 : 4i
+vowels_txt_LOLS3 : 4o
+vowels_txt_LOLS4 : 4u
+
+
+====Compression with runs of 1 and 2====
+File contents, 1sand2s.txt : 
+abcdefaabbcceeddff
+
+T
+INPUT:
+./compressT_LOLS "1sand2s.txt" 1
+OUTPUT:
+1sand2s_txt_LOLS :
+abcdefaabbcceeddff
+
+R
+INPUT:
+./compressR_LOLS "1sand2s.txt" 1
+OUTPUT:
+1sand2s_txt_LOLS :
+abcdefaabbcceeddff
+
+
+====Non alpha chars====
+File contents, split.txt :
+aaa%aaa%aaa%aaa%aaa
+
+T
+INPUT:
+./compressT_LOLS "split.txt" 1
+OUTPUT:
+split_txt_LOLS :
+15a
+
+R
+INPUT:
+./compressR_LOLS "split.txt" 1
+OUTPUT:
+split_txt_LOLS :
+15a
+
+
+====Begins and ends with nonalpha====
+File contents, puncstart.txt :
+****hhhh****iiii****
+
+T
+INPUT:
+./compressT_LOLS "puncstart.txt" 1
+OUTPUT:
+puncstart_txt_LOLS :
+4h4i
+
+R
+INPUT:
+./compressR_LOLS "puncstart.txt" 1
+OUTPUT:
+puncstart_txt_LOLS :
+4h4i
+
+
+====Long file====
+File contents, aaaa.txt : 1000 a's
+
+T
+INPUT:
+./compressT_LOLS "aaaa.txt" 1
+OUTPUT:
+aaaa_txt_LOLS :
+1000a
+
+R
+INPUT:
+./compressR_LOLS "aaaa.txt" 1
+OUTPUT:
+aaaa_txt_LOLS :
+1000a
+
+
+====Uneven split====
+File contents, 11bs.txt :
+bbbbbbbbbbb
+
+T
+INPUT:
+./compressT_LOLS "11bs.txt" 3
+OUTPUT:
+11bs_txt_LOLS0 : 5b
+11bs_txt_LOLS1 : 3b
+11bs_txt_LOLS2 : 3b
+
+R
+INPUT:
+./compressR_LOLS "11bs.txt" 3
+OUTPUT:
+11bs_txt_LOLS0 : 5b
+11bs_txt_LOLS1 : 3b
+11bs_txt_LOLS2 : 3b
+
