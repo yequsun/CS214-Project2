@@ -119,10 +119,12 @@ void * compress(void * ptr){
 	char * new_filename = create_output_filename(filename, strlen(filename), partno, parts);
 
 	//check if output file already exists:
+	/*
 	if(access(new_filename, F_OK) != -1){
 		printf("Compressed file already exists.\n");
 		return NULL;
 	}
+	*/
 
 	FILE * input = fopen(filename, "r");
 	FILE * output = fopen(new_filename, "w");
