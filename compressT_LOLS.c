@@ -135,7 +135,7 @@ void * compress(void * ptr){
 		 prev,
 		 curr;
 
-	fseek(input, start, SEEK_SET);
+	//fseek(input, start, SEEK_SET);
 	prev = '\0';
 
 	for(i = start; i < end; i++){

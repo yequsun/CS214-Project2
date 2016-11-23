@@ -113,11 +113,11 @@ void compressR_LOLS(char * filename, int parts){
 
 	while(j > 0){
 		wait(NULL);
-		printf("child complete\n");
+		//printf("child complete\n");
 		--j;
 	}
 
-	printf("complete\n");
+	//printf("complete\n");
 
 	return;
 }
