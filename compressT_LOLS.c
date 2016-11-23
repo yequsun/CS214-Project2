@@ -66,7 +66,7 @@ void compressT_LOLS(char * filename, int parts){
 	fclose(input);
 
 	if(parts > filesize){
-		printf("Error: Too many parts.\n");
+		printf("Error: You asked for %d parts. There are only %d characters in the file.\n", parts, filesize);
 		return;
 	}
 
@@ -101,7 +101,6 @@ void compressT_LOLS(char * filename, int parts){
 
 	for(i = 0; i < parts; i++){
 		pthread_join(thread_array[i], NULL);
-		printf("thread #%d joined\n", i);
 	}
 }
 
@@ -139,7 +138,7 @@ void * compress(void * ptr){
 	fseek(input, start, SEEK_SET);
 	prev = '\0';
 
-	for(i = start + 1; i < end; i++){
+	for(i = start; i < end; i++){
 		fseek(input, i, SEEK_SET);
 		test = fgetc(input);
 		
